@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:loyalty_app/reward_screen.dart';
 import 'package:loyalty_app/sign_up.dart';
 
 import 'home.dart';
+
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -14,24 +18,64 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
-  void _login() {
-    String email = _emailController.text.trim();
+  Future<Map<String, dynamic>> login() async {
+    final String apiUrl =
+        'https://loyality-app-backend.vercel.app/api/auth/login';
+
+    String username = _emailController.text.trim();
     String password = _passwordController.text.trim();
-    // Navigator.push(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => LoginScreen()),
-    // );
-    print("Email: ${_emailController.text}");
-    print("Password: ${_passwordController.text}");
-    if (email == "admin" && password == "admin") {
-      _emailController.clear();
-      _passwordController.clear();
+
+    // Create the request body
+    Map<String, String> requestBody = {
+      'username': username,
+      'password': password,
+    };
+
+    // Send the POST request
+    final http.Response response = await http.post(
+      Uri.parse(apiUrl),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(requestBody),
+    );
+
+    // Check if the request was successful
+    if (response.statusCode == 200) {
+      // Parse the response body
+      Map<String, dynamic> responseBody = jsonDecode(response.body);
+
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => Home()),
+        MaterialPageRoute(builder: (context) => RewardScreen()),
       );
+      _emailController.clear();
+      _passwordController.clear();
+      username = "";
+      password = "";
+
+      // Return the response body
+      return responseBody;
     } else {
-      print("Invalid credentials");
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Failed to Login. Please try again later.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+      // Request failed
+      throw Exception('Failed to login: ${response.statusCode}');
     }
   }
 
@@ -163,7 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           //   MaterialPageRoute(builder: (context) => LoginScreen()),
                           // );
 
-                          _login();
+                          login();
                         },
                         child: const Text(
                           'Sign Up',

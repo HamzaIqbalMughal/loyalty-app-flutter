@@ -1,42 +1,73 @@
 import 'package:flutter/material.dart';
 
-class Home extends StatefulWidget {
-  const Home({super.key});
-
-  @override
-  State<Home> createState() => _HomeState();
-}
-
-class _HomeState extends State<Home> {
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text('Home Screen',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                fontFamily: 'Roboto',
-              )),
-
-          SizedBox(
-            height: 50,
-          ),
-
-          // elevated button to navigate to the login screen
-          ElevatedButton(
+      appBar: AppBar(
+        centerTitle: true,
+        title: const Text('Home Screen'),
+        actions: [
+          // Add other action icons if needed
+          IconButton(
+            icon: const Icon(Icons.logout),
             onPressed: () {
-              Navigator.pop(context);
+              // go to the login screen
+              Navigator.of(context).pop();
             },
-            child: const Text('Logout'),
           ),
         ],
       ),
-    ));
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Text('Hi, Melissa',
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+            SizedBox(height: 8),
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 12, bottom: 10),
+              child: Text(
+                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum molestie eleifend lacus ac faucibus.',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+            SizedBox(height: 24),
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                children: <Widget>[
+                  _buildGridItem(Icons.monetization_on, 'Rewards'),
+                  _buildGridItem(Icons.credit_card, 'Show Card'),
+                  _buildGridItem(Icons.history, 'History'),
+                  _buildGridItem(Icons.person, 'Profile'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGridItem(IconData iconData, String title) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.blue,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Icon(iconData, size: 50, color: Colors.white),
+          SizedBox(height: 8),
+          Text(title, style: TextStyle(color: Colors.white, fontSize: 18)),
+        ],
+      ),
+    );
   }
 }
