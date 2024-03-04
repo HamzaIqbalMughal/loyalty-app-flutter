@@ -53,7 +53,6 @@ class _SignUpState extends State<SignUp> {
       fullName: fullName,
       email: email,
       password: password,
-      phoneNumber: phoneNumber,
     );
 
     SignUpService signUpService = SignUpService();
@@ -204,34 +203,34 @@ class _SignUpState extends State<SignUp> {
                       ),
                     ),
                     SizedBox(height: 20),
-                    const Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: Text("Phone",
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: FontWeight.normal,
-                              fontFamily: 'Roboto',
-                            )),
-                      ),
-                    ),
-                    TextFormField(
-                      controller: _phoneController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(
-                            color: Colors.white,
-                            width: 1.0,
-                          ),
-                        ),
-                        hintText: '924729876789',
-                      ),
-                      obscureText: false,
-                    ),
-                    SizedBox(height: 20),
+                    // const Align(
+                    //   alignment: Alignment.centerLeft,
+                    //   child: Padding(
+                    //     padding: const EdgeInsets.only(left: 10),
+                    //     child: Text("Phone",
+                    //         style: TextStyle(
+                    //           color: Colors.black,
+                    //           fontSize: 18,
+                    //           fontWeight: FontWeight.normal,
+                    //           fontFamily: 'Roboto',
+                    //         )),
+                    //   ),
+                    // ),
+                    // TextFormField(
+                    //   controller: _phoneController,
+                    //   decoration: InputDecoration(
+                    //     border: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(15),
+                    //       borderSide: BorderSide(
+                    //         color: Colors.white,
+                    //         width: 1.0,
+                    //       ),
+                    //     ),
+                    //     hintText: '924729876789',
+                    //   ),
+                    //   obscureText: false,
+                    // ),
+                    // SizedBox(height: 20),
                     const Align(
                       alignment: Alignment.centerLeft,
                       child: Padding(

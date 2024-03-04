@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:loyalty_app/card_screen.dart';
+import 'package:loyalty_app/profile_screen.dart';
+import 'package:loyalty_app/reward_screen.dart';
+
+import 'history_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
@@ -41,10 +46,10 @@ class HomeScreen extends StatelessWidget {
                 crossAxisSpacing: 16,
                 mainAxisSpacing: 16,
                 children: <Widget>[
-                  _buildGridItem(Icons.monetization_on, 'Rewards'),
-                  _buildGridItem(Icons.credit_card, 'Show Card'),
-                  _buildGridItem(Icons.history, 'History'),
-                  _buildGridItem(Icons.person, 'Profile'),
+                  _buildGridItem(context, Icons.monetization_on, 'Rewards'),
+                  _buildGridItem(context, Icons.credit_card, 'Show Card'),
+                  _buildGridItem(context, Icons.history, 'History'),
+                  _buildGridItem(context, Icons.person, 'Profile'),
                 ],
               ),
             ),
@@ -54,19 +59,43 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGridItem(IconData iconData, String title) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.blue,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Icon(iconData, size: 50, color: Colors.white),
-          SizedBox(height: 8),
-          Text(title, style: TextStyle(color: Colors.white, fontSize: 18)),
-        ],
+  Widget _buildGridItem(BuildContext context, IconData iconData, String title) {
+    return GestureDetector(
+      onTap: () {
+        switch (title) {
+          case 'Rewards':
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => RewardScreen()));
+            break;
+          case 'Show Card':
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => CardScreen()));
+            break;
+          case 'History':
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => HistoryScreen()));
+            break;
+          case 'Profile':
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => ProfileScreen()));
+            break;
+          default:
+            print('Unknown Grid Item');
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(iconData, size: 50, color: Colors.white),
+            SizedBox(height: 8),
+            Text(title, style: TextStyle(color: Colors.white, fontSize: 18)),
+          ],
+        ),
       ),
     );
   }
