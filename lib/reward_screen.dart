@@ -90,7 +90,7 @@ class _RewardScreenState extends State<RewardScreen>
                   onTap: () {
                     Navigator.pop(context);
                   },
-                  child: Icon(Icons.arrow_back)),
+                  child: Icon(Icons.arrow_back, color: Colors.black,)),
             ),
           ),
 

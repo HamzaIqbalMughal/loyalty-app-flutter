@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:loyalty_app/home_screen.dart';
 import 'package:loyalty_app/login_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -21,6 +22,8 @@ class _SignUpState extends State<SignUp> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
+  bool isSignUp = false;
+
   Future<void> _signUp() async {
     final String fullName = _nameController.text.trim();
     final String email = _emailController.text.trim();
@@ -28,7 +31,13 @@ class _SignUpState extends State<SignUp> {
     final String confirmPassword = _confirmPasswordController.text.trim();
     final String phoneNumber = _phoneController.text.trim();
 
+    setState(() {
+      isSignUp = true;
+    });
     if (password != confirmPassword) {
+      setState(() {
+        isSignUp = false;
+      });
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -62,23 +71,29 @@ class _SignUpState extends State<SignUp> {
       // Handle navigation or other UI updates upon successful signup
 
       if (isRegister == 200) {
+        setState(() {
+          isSignUp = false;
+        });
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => LoginScreen()),
+          MaterialPageRoute(builder: (context) => HomeScreen()),
         );
 
-        // _nameController.clear();
-        // _emailController.clear();
-        // _phoneController.clear();
-        // _phoneController.clear();
-        // _confirmPasswordController.clear();
+        _nameController.clear();
+        _emailController.clear();
+        _phoneController.clear();
+        _passwordController.clear();
+        _confirmPasswordController.clear();
       } else {
+        setState(() {
+          isSignUp = false;
+        });
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Error'),
-              content: Text('Failed to sign up. Please try again later.'),
+              title: Text('Email already exists'),
+              content: Text('Please try again with a different email.'),
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
@@ -92,12 +107,15 @@ class _SignUpState extends State<SignUp> {
         );
       }
     } catch (e) {
+      setState(() {
+        isSignUp = false;
+      });
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Error'),
-            content: Text('Failed to sign up. Please try again later.'),
+            content: Text(e.toString()),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
@@ -194,7 +212,7 @@ class _SignUpState extends State<SignUp> {
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(
+                          borderSide: const BorderSide(
                             color: Colors.white,
                             width: 1.0,
                           ),
@@ -291,7 +309,7 @@ class _SignUpState extends State<SignUp> {
                       alignment: Alignment.center,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          primary: Color(0xFF094EFF),
+                          backgroundColor: Color(0xFF094EFF),
                           padding: const EdgeInsets.symmetric(
                               vertical: 12, horizontal: 100),
                           shape: RoundedRectangleBorder(
@@ -299,7 +317,9 @@ class _SignUpState extends State<SignUp> {
                           ),
                         ),
                         onPressed: _signUp,
-                        child: const Text(
+                        child: isSignUp ? CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ) : Text(
                           'Sign Up',
                           style: TextStyle(
                             color: Colors.white,

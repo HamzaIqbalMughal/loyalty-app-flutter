@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:loyalty_app/card_screen.dart';
 import 'package:loyalty_app/history_screen.dart';
-import 'package:loyalty_app/home.dart';
+import 'package:loyalty_app/home_screen.dart';
 import 'package:loyalty_app/reward_screen.dart';
 import 'package:loyalty_app/splash_screen.dart';
 

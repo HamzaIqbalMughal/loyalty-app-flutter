@@ -9,7 +9,7 @@ class CardScreen extends StatelessWidget {
         backgroundColor: Colors.blue.shade800,
         title: Text('Card'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: <Widget>[

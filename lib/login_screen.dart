@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:loyalty_app/reward_screen.dart';
 import 'package:loyalty_app/sign_up.dart';
 
-import 'home.dart';
+import 'home_screen.dart';
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -18,6 +18,7 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
+  bool isSignIn = false;
   Future<Map<String, dynamic>> login() async {
     final String apiUrl =
         'https://loyality-app-backend.vercel.app/api/auth/login';
@@ -25,6 +26,11 @@ class _LoginScreenState extends State<LoginScreen> {
     String username = _emailController.text.trim();
     String password = _passwordController.text.trim();
 
+
+    isSignIn = true;
+    setState(() {
+
+    });
     // Create the request body
     Map<String, String> requestBody = {
       'username': username,
@@ -45,10 +51,14 @@ class _LoginScreenState extends State<LoginScreen> {
       // Parse the response body
       Map<String, dynamic> responseBody = jsonDecode(response.body);
 
+      setState(() {
+        isSignIn = false;
+      });
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => RewardScreen()),
+        MaterialPageRoute(builder: (context) => HomeScreen()),
       );
+
       _emailController.clear();
       _passwordController.clear();
       username = "";
@@ -57,6 +67,10 @@ class _LoginScreenState extends State<LoginScreen> {
       // Return the response body
       return responseBody;
     } else {
+      setState(() {
+        isSignIn = false;
+
+      });
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -194,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.center,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          primary: Color(0xFF094EFF), // background
+                          backgroundColor: Color(0xFF094EFF), // background
                           padding: const EdgeInsets.symmetric(
                               vertical: 12, horizontal: 100),
                           shape: RoundedRectangleBorder(
@@ -209,8 +223,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                           login();
                         },
-                        child: const Text(
-                          'Sign Up',
+                        child: isSignIn ?  CircularProgressIndicator(
+                          color: Colors.white,
+                        ) : Text(
+                          'Sign In',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 18,

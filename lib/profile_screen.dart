@@ -9,12 +9,14 @@ class ProfileScreen extends StatelessWidget {
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             // Handle back button press
+            Navigator.pop(context);
           },
         ),
         actions: [
           IconButton(
             icon: Icon(Icons.settings, color: Colors.black),
             onPressed: () {
+
               // Handle settings button press
             },
           ),
