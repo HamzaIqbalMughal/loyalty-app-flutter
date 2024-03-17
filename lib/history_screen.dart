@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:loyalty_app/Service/transaction_history_service.dart';
 import 'package:loyalty_app/home_screen.dart';
+import 'package:loyalty_app/model/transaction_model.dart';
 import 'package:loyalty_app/reward_screen.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -9,6 +11,30 @@ class HistoryScreen extends StatefulWidget {
 }
 
 class _HistoryScreenState extends State<HistoryScreen> {
+
+  List<TransactionModel> transactionList = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    // getTransactions();
+  }
+
+  void getTransactions() async{
+    transactionList = await TransactionHistoryService().getTransactions();
+    for(var transaction in transactionList){
+      print('Transaction ID: ${transaction.id}');
+      print('User ID: ${transaction.userId}');
+      print('Item Name: ${transaction.itemName}');
+      print('Price: ${transaction.price}');
+      print('Transaction Date: ${transaction.transactionDate}');
+      print('Version: ${transaction.v}');
+      print('Full Name: ${transaction.fullName}');
+      print('\n');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
