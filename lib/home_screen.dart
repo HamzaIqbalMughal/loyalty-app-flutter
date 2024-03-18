@@ -1,15 +1,39 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loyalty_app/card_screen.dart';
+import 'package:loyalty_app/login_screen.dart';
 import 'package:loyalty_app/profile_screen.dart';
 import 'package:loyalty_app/reward_screen.dart';
+import 'package:loyalty_app/services/user_service.dart';
 
 import 'history_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+
+  late Map<String, dynamic> user;
+
+  @override
+  void initState() {
+    UserService().getUser().then((value) {
+      user = value;
+      print(user);
+    }).onError((error, stackTrace) {
+
+    });
+    // TODO: implement initState
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         centerTitle: true,
         title: const Text('Home Screen'),
         actions: [
@@ -17,8 +41,8 @@ class HomeScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              // go to the login screen
-              Navigator.of(context).pop();
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+              // Navigator.of(context).pop();
             },
           ),
         ],
@@ -29,8 +53,18 @@ class HomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            Text('Hi, Melissa',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+            FutureBuilder(
+              future: UserService().getUser(),
+              builder: (context, snapshot){
+                if(snapshot.hasData){
+                  return Text('Hi, ${user['user']['full_name']}',
+                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold));
+                }else{
+                  return Text('Hi, ***}',
+                      style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold));
+                }
+              },
+            ),
             SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.only(left: 16, right: 12, bottom: 10),

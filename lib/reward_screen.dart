@@ -50,6 +50,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
+import 'package:loyalty_app/services/user_service.dart';
+import 'package:toastification/toastification.dart';
 
 class RewardScreen extends StatefulWidget {
   @override
@@ -58,7 +60,6 @@ class RewardScreen extends StatefulWidget {
 
 class _RewardScreenState extends State<RewardScreen>
     with SingleTickerProviderStateMixin {
-
   /*
   void getDashboardData() async{
     String url = 'https://loyality-app-backend.vercel.app/api/loyality/dashboard';
@@ -85,39 +86,95 @@ class _RewardScreenState extends State<RewardScreen>
   }
 
    */
+
   late DashboardModel dashboard;
-  Future<DashboardModel> getDashboardData() async{
-    String url = 'https://loyality-app-backend.vercel.app/api/loyality/dashboard';
-    try{
+
+  Future<DashboardModel> getDashboardData() async {
+    try {
+      final user = await UserService().getUser();
+      String url =
+          'https://loyality-app-backend.vercel.app/api/loyality/dashboard';
+
+      print(user['data']);
+
       final response = await http.get(Uri.parse(url), headers: {
-        'Authorization':
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjIyZmY5MDM2ZTE3MmRhNjJmZmU4ZCIsInVzZXJuYW1lIjoic2FqaWRiaGF0dGlAZ21haWwuY29tIiwiaWF0IjoxNzEwMzcwOTM1fQ.yPZuPzoRfiE5C2hgrQefA74jAzaG8uzrPnfvzyS3wo0'
+        'Authorization': user['data'],
       });
       var data = jsonDecode(response.body.toString());
-      // print(data['response']['full_name']);
+
       if (response.statusCode == 200) {
         dashboard = DashboardModel(
-            full_name: data['response']['full_name'],
-            loyalty_balance: data['response']['loyalty_balance'],
-            loyalty_level: data['response']['loyalty_level']
+          full_name: data['response']['full_name'],
+          loyalty_balance: (data['response']['loyalty_balance'] as num).toDouble(),
+          loyalty_level: data['response']['loyalty_level'],
         );
         return dashboard;
       } else {
-        kDebugMode ? print('error while fetching') : null;
+        return DashboardModel(
+          full_name: '',
+          loyalty_balance: 0,
+          loyalty_level: 0,
+        );
       }
-    }catch(e){
-      kDebugMode ? print('from catch block'+e.toString()) : null;
-    }
-    dashboard = DashboardModel(
+    } catch (e) {
+      kDebugMode ? print(e.toString()) : null;
+      return DashboardModel(
         full_name: '',
         loyalty_balance: 0,
-        loyalty_level: 0
-    );
-    return dashboard;
+        loyalty_level: 0,
+      );
+    }
   }
 
+  /*
+  late DashboardModel dashboard;
+  Future<DashboardModel> getDashboardData() async{
+    await UserService().getUser().then((value) async {
+      String url = 'https://loyality-app-backend.vercel.app/api/loyality/dashboard';
+      try{
+        final response = await http.get(Uri.parse(url), headers: {
+          'Authorization':
+              value['data']
+        });
+        var data = jsonDecode(response.body.toString());
+        // print(data['response']['full_name']);
+        if (response.statusCode == 200) {
+          dashboard = DashboardModel(
+              full_name: data['response']['full_name'],
+              loyalty_balance: data['response']['loyalty_balance'],
+              loyalty_level: data['response']['loyalty_level']
+          );
+          return dashboard;
+        } else {
+          // kDebugMode ? print('error while fetching') : null;
+          return DashboardModel(
+              full_name: '',
+              loyalty_balance: 0,
+              loyalty_level: 0
+          );
+        }
+      }catch(e){
+        // kDebugMode ? print('from catch block'+e.toString()) : null;
+        return DashboardModel(
+            full_name: '',
+            loyalty_balance: 0,
+            loyalty_level: 0
+        );
+      }
+    }).onError((error, stackTrace) {
+      return DashboardModel(
+          full_name: '',
+          loyalty_balance: 0,
+          loyalty_level: 0
+      );
+    });
+
+  }
+
+   */
 
   late Timer _timer;
+
   @override
   void initState() {
     super.initState();
@@ -163,7 +220,10 @@ class _RewardScreenState extends State<RewardScreen>
                   onTap: () {
                     Navigator.pop(context);
                   },
-                  child: Icon(Icons.arrow_back, color: Colors.black,)),
+                  child: Icon(
+                    Icons.arrow_back,
+                    color: Colors.black,
+                  )),
             ),
           ),
 
@@ -194,8 +254,8 @@ class _RewardScreenState extends State<RewardScreen>
                   ),
                   FutureBuilder(
                     future: getDashboardData(),
-                    builder: (context, snapshot){
-                      if(snapshot.hasData){
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
                         return CustomPaint(
                           foregroundPainter: CircleProgress(50),
                           child: Container(
@@ -210,7 +270,7 @@ class _RewardScreenState extends State<RewardScreen>
                             ),
                           ),
                         );
-                      }else{
+                      } else {
                         return CustomPaint(
                           foregroundPainter: CircleProgress(0),
                           child: Container(
@@ -300,15 +360,18 @@ class CircleProgress extends CustomPainter {
   }
 }
 
-class DashboardModel{
+class DashboardModel {
   String full_name;
   int loyalty_level;
   double loyalty_balance;
-  DashboardModel({required this.full_name, required this.loyalty_balance, required this.loyalty_level});
+
+  DashboardModel(
+      {required this.full_name,
+      required this.loyalty_balance,
+      required this.loyalty_level});
 
   @override
   String toString() {
     return 'DashboardModel { full_name: $full_name, loyalty_balance: $loyalty_balance, loyalty_level: $loyalty_level }';
   }
-
 }

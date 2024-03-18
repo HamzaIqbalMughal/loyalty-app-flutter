@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:loyalty_app/reward_screen.dart';
+import 'package:loyalty_app/services/user_service.dart';
 import 'package:loyalty_app/sign_up.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home_screen.dart';
 
@@ -22,14 +24,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<Map<String, dynamic>> login() async {
     final String apiUrl =
         'https://loyality-app-backend.vercel.app/api/auth/login';
-
     String username = _emailController.text.trim();
     String password = _passwordController.text.trim();
-
-
     isSignIn = true;
     setState(() {
-
     });
     // Create the request body
     Map<String, String> requestBody = {
@@ -65,6 +63,9 @@ class _LoginScreenState extends State<LoginScreen> {
       password = "";
 
       // Return the response body
+
+      // print(responseBody['data']);
+
       return responseBody;
     } else {
       setState(() {
@@ -221,7 +222,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           //   MaterialPageRoute(builder: (context) => LoginScreen()),
                           // );
 
-                          login();
+                          login().then((value) {
+                            UserService().storeUserSession(value);
+                          }).onError((error, stackTrace) {
+
+                          });
                         },
                         child: isSignIn ?  CircularProgressIndicator(
                           color: Colors.white,
@@ -257,7 +262,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           TextButton(
                             onPressed: () {
-                              Navigator.push(
+                              Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => SignUp()),
