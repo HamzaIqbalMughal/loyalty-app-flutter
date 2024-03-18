@@ -1,5 +1,6 @@
 
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:loyalty_app/model/transaction_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -42,10 +43,10 @@ class TransactionHistoryService{
         // print(transactionsList[0].toString());
         return transactionsList;
       } else {
-        print('Error while api');
+        kDebugMode ? print('error while fetching') : null;
       }
     }catch(e){
-      print(e.toString());
+      kDebugMode ? print('from catch block'+e.toString()) : null;
     }
     return transactionsList;
   }

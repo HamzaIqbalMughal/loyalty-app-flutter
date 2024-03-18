@@ -102,9 +102,8 @@ class _RewardScreenState extends State<RewardScreen>
             loyalty_level: data['response']['loyalty_level']
         );
         return dashboard;
-        kDebugMode ? print(dashboard) : null;
       } else {
-        kDebugMode ? print('error in fetching') : null;
+        kDebugMode ? print('error while fetching') : null;
       }
     }catch(e){
       kDebugMode ? print('from catch block'+e.toString()) : null;
@@ -122,14 +121,12 @@ class _RewardScreenState extends State<RewardScreen>
   @override
   void initState() {
     super.initState();
-
     /*
     _timer = Timer.periodic(Duration(seconds: 3), (_) {
       setState(() {
         print('Running code in timers setstate');
       });
     });
-
      */
   }
 
@@ -198,7 +195,7 @@ class _RewardScreenState extends State<RewardScreen>
                     builder: (context, snapshot){
                       if(snapshot.hasData){
                         return CustomPaint(
-                          foregroundPainter: CircleProgress(60),
+                          foregroundPainter: CircleProgress(50),
                           child: Container(
                             width: 200,
                             height: 200,
@@ -212,9 +209,11 @@ class _RewardScreenState extends State<RewardScreen>
                           ),
                         );
                       }else{
-                        return Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
+                        return CustomPaint(
+                          foregroundPainter: CircleProgress(0),
+                          child: Container(
+                            width: 200,
+                            height: 200,
                           ),
                         );
                       }
