@@ -1,13 +1,16 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:intl/intl.dart';
 import 'package:loyalty_app/Service/transaction_history_service.dart';
 import 'package:loyalty_app/home_screen.dart';
 import 'package:loyalty_app/model/transaction_model.dart';
 import 'package:loyalty_app/reward_screen.dart';
 import 'package:http/http.dart' as http;
+
 
 
 class HistoryScreen extends StatefulWidget {
@@ -64,6 +67,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
     return transactionsList;
   }
 
+  String formatDate(String dateString) {
+    DateTime date = DateTime.parse(dateString);
+    DateFormat formatter = DateFormat('d MMMM yyyy');
+    String formattedDate = formatter.format(date);
+    return formattedDate;
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,30 +124,54 @@ class _HistoryScreenState extends State<HistoryScreen> {
                           fontWeight: FontWeight.bold,
                           color: Colors.black),
                     ),
-                    // SizedBox(height: 16),
-                    // Add a ListView here
-                    // Replace this ListView with your content
-                    // ListView(children: [Text('Item 1'), Text('Item 2')
 
                     Expanded(
                         child: FutureBuilder(
-                            future: TransactionHistoryService().getTransactions(),
+                            future: getTransactions(),
                             builder: (context, snapshot){
                               if(snapshot.hasData){
                                 return ListView.builder(
                                     itemCount: transactionsList.length,
                                     itemBuilder: (context, index){
+                                      String formattedDate = formatDate(snapshot.data![index].transactionDate.toString());
                                       return Padding(
                                         padding: const EdgeInsets.only(bottom: 20),
+                                        child: ListTile(
+                                          leading: Text("\$ "+snapshot.data![index].price.toString(),
+                                              style:
+                                              TextStyle(fontSize: 20, color: Colors.black)),
+                                          title: Expanded(
+                                            child: Text(snapshot.data![index].itemName.toString(),
+                                              style:
+                                              TextStyle(fontSize: 22, color: Colors.black, fontWeight: FontWeight.bold),
+                                              maxLines: 1,
+                                              // overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          subtitle: Text(formattedDate),
+                                          trailing: Chip(
+                                            label: Text("Completed",
+                                                style:
+                                                TextStyle(fontSize: 10, color: Colors.black)),
+                                            color: MaterialStateColor.resolveWith(
+                                                    (states) => Colors.green),
+                                          ),
+                                        ),
+                                        /*
                                         child: Row(
                                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Text("500\$",
+                                            Text("\$ "+snapshot.data![index].price.toString(),
                                                 style:
                                                 TextStyle(fontSize: 20, color: Colors.black)),
-                                            Text("Project Name",
-                                                style:
-                                                TextStyle(fontSize: 22, color: Colors.black)),
+                                            Expanded(
+                                              child: Text(snapshot.data![index].itemName.toString(),
+                                                  style:
+                                                  TextStyle(fontSize: 22, color: Colors.black),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
                                             Chip(
                                               label: Text("Completed",
                                                   style:
@@ -146,6 +181,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                             ),
                                           ],
                                         ),
+
+                                         */
                                       );
                                     }
                                 );
@@ -159,94 +196,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             }
                         )
                     ),
-
-                    /*
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("500\$",
-                            style:
-                                TextStyle(fontSize: 20, color: Colors.black)),
-                        Text("Project Name",
-                            style:
-                                TextStyle(fontSize: 22, color: Colors.black)),
-                        Chip(
-                          label: Text("Completed",
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.black)),
-                          color: MaterialStateColor.resolveWith(
-                              (states) => Colors.green),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("500\$",
-                            style:
-                                TextStyle(fontSize: 20, color: Colors.black)),
-                        Text("Project Name",
-                            style:
-                                TextStyle(fontSize: 22, color: Colors.black)),
-                        Chip(
-                          label: Text("Completed",
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.black)),
-                          color: MaterialStateColor.resolveWith(
-                              (states) => Colors.green),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("500\$",
-                            style:
-                                TextStyle(fontSize: 20, color: Colors.black)),
-                        Text("Project Name",
-                            style:
-                                TextStyle(fontSize: 22, color: Colors.black)),
-                        Chip(
-                          label: Text("Completed",
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.black)),
-                          color: MaterialStateColor.resolveWith(
-                              (states) => Colors.green),
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text("500\$",
-                            style:
-                                TextStyle(fontSize: 20, color: Colors.black)),
-                        Text("Project Name",
-                            style:
-                                TextStyle(fontSize: 22, color: Colors.black)),
-                        Chip(
-                          label: Text("Completed",
-                              style:
-                                  TextStyle(fontSize: 16, color: Colors.black)),
-                          color: MaterialStateColor.resolveWith(
-                              (states) => Colors.green),
-                        ),
-                      ],
-                    ),
-
-                    */
                   ]),
                 ),
               ),

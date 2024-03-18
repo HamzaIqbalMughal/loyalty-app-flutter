@@ -121,12 +121,14 @@ class _RewardScreenState extends State<RewardScreen>
   @override
   void initState() {
     super.initState();
+
     /*
     _timer = Timer.periodic(Duration(seconds: 3), (_) {
       setState(() {
         print('Running code in timers setstate');
       });
     });
+
      */
   }
 
@@ -300,7 +302,8 @@ class CircleProgress extends CustomPainter {
 
 class DashboardModel{
   String full_name;
-  int loyalty_balance, loyalty_level;
+  int loyalty_level;
+  double loyalty_balance;
   DashboardModel({required this.full_name, required this.loyalty_balance, required this.loyalty_level});
 
   @override
