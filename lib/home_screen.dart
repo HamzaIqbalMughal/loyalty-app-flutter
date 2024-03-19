@@ -16,16 +16,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
-  late Map<String, dynamic> user;
-
   @override
   void initState() {
-    UserService().getUser().then((value) {
-      user = value;
-      print(user);
-    }).onError((error, stackTrace) {
-
-    });
     // TODO: implement initState
     super.initState();
   }
@@ -41,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
+              UserService().removeUserSession();
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
               // Navigator.of(context).pop();
             },
@@ -57,8 +50,10 @@ class _HomeScreenState extends State<HomeScreen> {
               future: UserService().getUser(),
               builder: (context, snapshot){
                 if(snapshot.hasData){
-                  return Text('Hi, ${user['user']['full_name']}',
+                  return Text('Hi, ${snapshot.data!['user']['full_name']}',
                       style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold));
+                  // return Text('Hi, ${user['user']['full_name']}',
+                  //     style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold));
                 }else{
                   return Text('Hi, ***}',
                       style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold));

@@ -5,11 +5,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:intl/intl.dart';
-import 'package:loyalty_app/Service/transaction_history_service.dart';
+import 'package:loyalty_app/services/transaction_history_service.dart';
 import 'package:loyalty_app/home_screen.dart';
-import 'package:loyalty_app/model/transaction_model.dart';
 import 'package:loyalty_app/reward_screen.dart';
 import 'package:http/http.dart' as http;
+import 'package:loyalty_app/services/user_service.dart';
+
+import 'models/transaction_model.dart';
 
 
 
@@ -44,19 +46,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
    */
 
-  String url = 'https://loyality-app-backend.vercel.app/api/transaction/transaction-history';
   List<TransactionModel> transactionsList = [];
 
   Future<List<TransactionModel>> getTransactions() async {
+    String url = 'https://loyality-app-backend.vercel.app/api/transaction/transaction-history';
     try{
-      final response = await http.get(Uri.parse(url), headers: {'Authorization' : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjIyZmY5MDM2ZTE3MmRhNjJmZmU4ZCIsInVzZXJuYW1lIjoic2FqaWRiaGF0dGlAZ21haWwuY29tIiwiaWF0IjoxNzEwMzcwOTM1fQ.yPZuPzoRfiE5C2hgrQefA74jAzaG8uzrPnfvzyS3wo0'});
+      final user = await UserService().getUser();
+      print(user['data']);
+
+      final response = await http.get(Uri.parse(url), headers: {'Authorization' : user['data']});
       var data = jsonDecode(response.body.toString());
       if (response.statusCode == 200) {
         transactionsList.clear();
         for(Map i in data['transactionHistory']){
           transactionsList.add(TransactionModel.fromJson(i));
         }
-        // print(transactionsList[0].toString());
         return transactionsList;
       } else {
         kDebugMode ? print('error while fetching') : null;
@@ -130,62 +134,53 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             future: getTransactions(),
                             builder: (context, snapshot){
                               if(snapshot.hasData){
-                                return ListView.builder(
-                                    itemCount: transactionsList.length,
-                                    itemBuilder: (context, index){
-                                      String formattedDate = formatDate(snapshot.data![index].transactionDate.toString());
-                                      return Padding(
-                                        padding: const EdgeInsets.only(bottom: 20),
-                                        child: ListTile(
-                                          leading: Text("\$ "+snapshot.data![index].price.toString(),
-                                              style:
-                                              TextStyle(fontSize: 20, color: Colors.black)),
-                                          title: Expanded(
-                                            child: Text(snapshot.data![index].itemName.toString(),
-                                              style:
-                                              TextStyle(fontSize: 22, color: Colors.black, fontWeight: FontWeight.bold),
-                                              maxLines: 1,
-                                              // overflow: TextOverflow.ellipsis,
+                                if(transactionsList.length == 0){
+                                  return Center(
+                                    child: Text('No any transaction yet'),
+                                  );
+                                }else{
+                                  return ListView.builder(
+                                      itemCount: transactionsList.length,
+                                      itemBuilder: (context, index){
+                                        String formattedDate = formatDate(snapshot.data![index].transactionDate.toString());
+                                        return Container(
+                                          margin: EdgeInsets.symmetric(vertical: 4), // Adjust margin as needed
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.circular(4), // Adjust border radius as needed
+                                            border: Border.all(
+                                              color: Colors.grey,
+                                              width: 0.2
                                             ),
                                           ),
-                                          subtitle: Text(formattedDate),
-                                          trailing: Chip(
-                                            label: Text("Completed",
-                                                style:
-                                                TextStyle(fontSize: 10, color: Colors.black)),
-                                            color: MaterialStateColor.resolveWith(
-                                                    (states) => Colors.green),
-                                          ),
-                                        ),
-                                        /*
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text("\$ "+snapshot.data![index].price.toString(),
-                                                style:
-                                                TextStyle(fontSize: 20, color: Colors.black)),
-                                            Expanded(
-                                              child: Text(snapshot.data![index].itemName.toString(),
+                                          child: Card(
+                                            elevation: 0, // Set Card elevation to 0 to avoid additional shadows
+                                            child: ListTile(
+                                              leading: Text("\$ "+snapshot.data![index].price.toString(),
                                                   style:
-                                                  TextStyle(fontSize: 22, color: Colors.black),
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
+                                                  TextStyle(fontSize: 20, color: Colors.black)),
+                                              title: Expanded(
+                                                child: Text(snapshot.data![index].itemName.toString(),
+                                                  style:
+                                                  TextStyle(fontSize: 22, color: Colors.black, fontWeight: FontWeight.bold),
+                                                  maxLines: 1,
+                                                  // overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              subtitle: Text(formattedDate),
+                                              trailing: Chip(
+                                                label: Text("Completed",
+                                                    style:
+                                                    TextStyle(fontSize: 10, color: Colors.black)),
+                                                color: MaterialStateColor.resolveWith(
+                                                        (states) => Colors.green),
                                               ),
                                             ),
-                                            Chip(
-                                              label: Text("Completed",
-                                                  style:
-                                                  TextStyle(fontSize: 16, color: Colors.black)),
-                                              color: MaterialStateColor.resolveWith(
-                                                      (states) => Colors.green),
-                                            ),
-                                          ],
-                                        ),
+                                          ),
+                                        );
+                                      }
+                                  );
 
-                                         */
-                                      );
-                                    }
-                                );
+                                }
                               }else{
                                 return Center(
                                   child: CircularProgressIndicator(

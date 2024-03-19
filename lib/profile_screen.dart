@@ -1,6 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:loyalty_app/services/dashboard_service.dart';
+import 'package:loyalty_app/services/user_service.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+
+  late Map<String, dynamic> user;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    loadUser();
+    super.initState();
+  }
+
+  void loadUser() async{
+    user = await UserService().getUser();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,9 +62,21 @@ class ProfileScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Text(
-              'Melissa',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            FutureBuilder(
+                future: UserService().getUser(),
+                builder: (context, snapshot){
+                  if(snapshot.hasData){
+                    return Text(
+                      snapshot.data!['user']['full_name'],
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    );
+                  }else{
+                    return Text(
+                    " ",
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    );
+                  }
+                }
             ),
             SizedBox(height: 8),
             Text(
@@ -59,7 +92,21 @@ class ProfileScreen extends StatelessWidget {
               onPressed: () {
                 // Handle level button press
               },
-              child: Text('Your are now on Level 1'),
+              child: FutureBuilder(
+                future: DashboardService().getDashboardData(),
+                builder: (context, snapshot){
+                  if(snapshot.hasData){
+                    if(snapshot.data!.loyalty_balance == 0){
+                      return Text("You don't have loyalty yet");
+                    } else{
+                      return Text('You are now on Level ${snapshot.data!.loyalty_level.toString()}');
+                    }
+                  }else{
+                    return Text('    ');
+                  }
+                },
+              ),
+              // child: Text('Your are now on Level 1'),
             ),
             SizedBox(height: 16),
             LevelIndicator(title: 'Level 1', loyalty: '5% Loyalty'),

@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:loyalty_app/const.dart';
-
-import '../model/register_model.dart';
+import '../models/register_model.dart';
 
 class SignUpService {
   // ; // Replace with your actual URL

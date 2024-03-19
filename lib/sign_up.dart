@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'Service/register_service.dart';
-import 'model/register_model.dart';
+import 'models/register_model.dart';
 
 class SignUp extends StatefulWidget {
   const SignUp({Key? key}) : super(key: key);
@@ -74,10 +74,28 @@ class _SignUpState extends State<SignUp> {
         setState(() {
           isSignUp = false;
         });
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Alert'),
+              content: Text('Account has been created Successfully, Please LogIn'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                    );
+                  },
+                  child: Text('Close'),
+                ),
+              ],
+            );
+          },
         );
+
 
         _nameController.clear();
         _emailController.clear();

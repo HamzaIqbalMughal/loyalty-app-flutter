@@ -50,8 +50,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:http/http.dart' as http;
+import 'package:loyalty_app/services/dashboard_service.dart';
 import 'package:loyalty_app/services/user_service.dart';
 import 'package:toastification/toastification.dart';
+import 'models/dashbaord_model.dart';
 
 class RewardScreen extends StatefulWidget {
   @override
@@ -60,121 +62,8 @@ class RewardScreen extends StatefulWidget {
 
 class _RewardScreenState extends State<RewardScreen>
     with SingleTickerProviderStateMixin {
-  /*
-  void getDashboardData() async{
-    String url = 'https://loyality-app-backend.vercel.app/api/loyality/dashboard';
-    try{
-      final response = await http.get(Uri.parse(url), headers: {
-        'Authorization':
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY1ZjIyZmY5MDM2ZTE3MmRhNjJmZmU4ZCIsInVzZXJuYW1lIjoic2FqaWRiaGF0dGlAZ21haWwuY29tIiwiaWF0IjoxNzEwMzcwOTM1fQ.yPZuPzoRfiE5C2hgrQefA74jAzaG8uzrPnfvzyS3wo0'
-      });
-      var data = jsonDecode(response.body.toString());
-      // print(data['response']['full_name']);
-      if (response.statusCode == 200) {
-        DashboardModel dashboard = DashboardModel(
-            full_name: data['response']['full_name'],
-            loyalty_balance: data['response']['loyalty_balance'],
-            loyalty_level: data['response']['loyalty_level']
-        );
-        kDebugMode ? print(dashboard) : null;
-      } else {
-        kDebugMode ? print('error in fetching') : null;
-      }
-    }catch(e){
-      kDebugMode ? print('from catch block'+e.toString()) : null;
-    }
-  }
-
-   */
-
-  late DashboardModel dashboard;
-
-  Future<DashboardModel> getDashboardData() async {
-    try {
-      final user = await UserService().getUser();
-      String url =
-          'https://loyality-app-backend.vercel.app/api/loyality/dashboard';
-
-      print(user['data']);
-
-      final response = await http.get(Uri.parse(url), headers: {
-        'Authorization': user['data'],
-      });
-      var data = jsonDecode(response.body.toString());
-
-      if (response.statusCode == 200) {
-        dashboard = DashboardModel(
-          full_name: data['response']['full_name'],
-          loyalty_balance: (data['response']['loyalty_balance'] as num).toDouble(),
-          loyalty_level: data['response']['loyalty_level'],
-        );
-        return dashboard;
-      } else {
-        return DashboardModel(
-          full_name: '',
-          loyalty_balance: 0,
-          loyalty_level: 0,
-        );
-      }
-    } catch (e) {
-      kDebugMode ? print(e.toString()) : null;
-      return DashboardModel(
-        full_name: '',
-        loyalty_balance: 0,
-        loyalty_level: 0,
-      );
-    }
-  }
-
-  /*
-  late DashboardModel dashboard;
-  Future<DashboardModel> getDashboardData() async{
-    await UserService().getUser().then((value) async {
-      String url = 'https://loyality-app-backend.vercel.app/api/loyality/dashboard';
-      try{
-        final response = await http.get(Uri.parse(url), headers: {
-          'Authorization':
-              value['data']
-        });
-        var data = jsonDecode(response.body.toString());
-        // print(data['response']['full_name']);
-        if (response.statusCode == 200) {
-          dashboard = DashboardModel(
-              full_name: data['response']['full_name'],
-              loyalty_balance: data['response']['loyalty_balance'],
-              loyalty_level: data['response']['loyalty_level']
-          );
-          return dashboard;
-        } else {
-          // kDebugMode ? print('error while fetching') : null;
-          return DashboardModel(
-              full_name: '',
-              loyalty_balance: 0,
-              loyalty_level: 0
-          );
-        }
-      }catch(e){
-        // kDebugMode ? print('from catch block'+e.toString()) : null;
-        return DashboardModel(
-            full_name: '',
-            loyalty_balance: 0,
-            loyalty_level: 0
-        );
-      }
-    }).onError((error, stackTrace) {
-      return DashboardModel(
-          full_name: '',
-          loyalty_balance: 0,
-          loyalty_level: 0
-      );
-    });
-
-  }
-
-   */
 
   late Timer _timer;
-
   @override
   void initState() {
     super.initState();
@@ -253,23 +142,41 @@ class _RewardScreenState extends State<RewardScreen>
                     height: 20,
                   ),
                   FutureBuilder(
-                    future: getDashboardData(),
+                    future: DashboardService().getDashboardData(),
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        return CustomPaint(
-                          foregroundPainter: CircleProgress(50),
-                          child: Container(
-                            width: 200,
-                            height: 200,
-                            child: Center(
-                              child: Text(
-                                snapshot.data!.loyalty_balance.toString(),
-                                style: TextStyle(
-                                    fontSize: 30, fontWeight: FontWeight.bold),
+                        if(snapshot.data!.loyalty_balance == 0){
+                          return CustomPaint(
+                            foregroundPainter: CircleProgress(0),
+                            child: Container(
+                              width: 200,
+                              height: 200,
+                              child: Center(
+                                child: Text(
+                                  'No loyalty points yet',
+                                  style: TextStyle(
+                                      fontSize: 15, fontWeight: FontWeight.bold),
+                                ),
                               ),
                             ),
-                          ),
-                        );
+                          );
+                        }else{
+                          return CustomPaint(
+                            foregroundPainter: CircleProgress(43),
+                            child: Container(
+                              width: 200,
+                              height: 200,
+                              child: Center(
+                                child: Text(
+                                  snapshot.data!.loyalty_balance.toString(),
+                                  style: TextStyle(
+                                      fontSize: 30, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+
                       } else {
                         return CustomPaint(
                           foregroundPainter: CircleProgress(0),
@@ -357,21 +264,5 @@ class CircleProgress extends CustomPainter {
   @override
   bool shouldRepaint(CustomPainter oldDelegate) {
     return true;
-  }
-}
-
-class DashboardModel {
-  String full_name;
-  int loyalty_level;
-  double loyalty_balance;
-
-  DashboardModel(
-      {required this.full_name,
-      required this.loyalty_balance,
-      required this.loyalty_level});
-
-  @override
-  String toString() {
-    return 'DashboardModel { full_name: $full_name, loyalty_balance: $loyalty_balance, loyalty_level: $loyalty_level }';
   }
 }
